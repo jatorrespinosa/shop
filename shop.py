@@ -110,3 +110,7 @@ while control:
 mostrar_cesta(cesta)
 
 print("\n\t-> Gracias!")#Posible funcion de pago
+
+
+
+print("TEST")
