@@ -1,4 +1,4 @@
-#Ejercicio de clase -carrito- Prog. Av. Python 
+#Ejercicio de clase -carrito- Prog. Av. Python v1 idea shop
 # TorresEspinosa,JoseAntonio
 
 cesta = {
