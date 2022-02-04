@@ -1,45 +1,59 @@
-#Ejercicio de clase -carrito- Prog. Av. Python 
-# TorresEspinosa,JoseAntonio
+#--
+#----version 2.0 - Shop @ TorresEspinosa,JoseAntonio----
+#---
 
-cesta = {
-    "stout" : 0,
-    "ipa" : 0,
-    "ale" : 0,
-    "pastry" : 0
-}
-stock = {
-    "stout" : 3,
-    "ipa" : 5,
-    "ale" : 8,
-    "pastry" : 4
-}
-precio = {
-    "stout" : 4.5,
-    "ipa" : 3.75,
-    "ale" : 2.75,
-    "pastry" : 5
-}
+from cliente import *
 
-def add_producto(name, amount):
-    cesta[name] += amount
-    stock[name] -= amount
+#Posible funcion leer productos disponibles
 
-def comprar (name):
-    #Comprueba stock
+#Func. control existencias, EVO
+def existe_stock(name, c):
+    check = False
+    #Recorre datos
+    for i in disp:
+        #si hay coincidencia hay stock
+        if name == i.get_nombre():
+            if c < i.get_stock():
+                check = True
+                break
+            else:
+                print(f"\t-> Solo quedan {i.get_stock()}")
+    return check
+
+def existe(name):
+    check = False
+    #Recorre datos
+    for i in disp:
+        #si hay coincidencia existe
+        if name == i.get_nombre():
+            check = True
+            break
+    return check
+
+
+#Func. comprar, EVO
+def comprar (c, name_product):
+    #Comprueba cantidad negariva
     try:
         x = int(input("\t-> Que cantidad?\n"))
         if x < 0:
             raise ValueError("ERROR. Cantidad negativa!")
         else:
-            if x <= stock.get(name): #Comprueba valor correcto
-                add_producto(name, x)
-            else:
-                if x > stock.get(name): 
-                    print("\t-> Solo quedan " + str(stock.get(name)) + " " + name + "\n") #Posible reiteracion para volver a preguntar cantidad
+            if existe_stock(name_product, x): #Comprueba si hay stock
+                c.add_producto(name_product, x)
+            #Posible reiteracion para volver a preguntar cantidad
     except ValueError as e:
         print(e) #Si se retornara el error podriamos saltarnos mediante un control en 'MAIN' la siguiente función que se ejecutaria 'finalizar()'
 
-def mostrar_cesta(cesta_compra):
+#Func. finalizar, EVO
+def get_disponibles():
+    #Recorre datos
+    for i in disp:
+        #si hay stock lo muestra
+        if i.get_stock() > 0:
+            print(f"\t{i.get_nombre()} {i.get_precio()}€")
+
+def pagar(c):
     total = 0 #Posible retrurn para funcion de pago
 
     #HEAD
@@ -48,33 +62,22 @@ def mostrar_cesta(cesta_compra):
     print("--------------------------------------------------------------------------------------")
 
     #PRODUCTOS
-    ''' OPCION _solo_key_: para recorrer con for!
-    for k in lista_compra:
-        if lista_compra.get(k) > 0 :
-            print( k + " \t\t " + str(lista_compra.get(k)) + " \t\t " + str(precio.get(k)) + " \t\t Valor")
-    '''
-    for k, aux in cesta_compra.items():
-        if aux > 0 :
-            #calculo de valores
-            coste = aux * precio.get(k)
+    #recorre cesta
+    for i in c.get_cesta():
+            #Calcula coste y total
+            coste = i.get_stock() * i.get_precio()
             total += coste
-            print( k + " \t\t\t " + str(aux) + " \t\t\t " + str(precio.get(k)) + " € \t\t\t " + str(coste) + " €" )
+            #imprime desglose
+            print( i.get_nombre() + " \t\t\t " + str(i.get_stock()) + " \t\t\t " + str(i.get_precio()) + " € \t\t\t " + str(coste) + " €" )
     
     #TOTAL - anteriormente calculado, calculo de valores^
     print("--------------------------------------------------------------------------------------")
     print("\t\t\t\t\t\t TOTAL \t\t\t" + str(total) + " €")
 
-def mostrar_productos():
-    for k, aux in precio.items():
-        if stock[k] > 0: #hace que no aparezca en el listado pero si puedes volver a pedirla. ERROR. Faltaria una funcion si_esta_stock
-            print(k + "\t" + str(aux) + " €")
-    print('\n')
-
-def finalizar_servicio():
-    check = input("\t-> Desea seguir pidiendo Y/N? ")
-    #Contorla que entre Y/y pero resto de entradas no
+def finalizar():
+    check = input("-> Desea algo mas Y/N? ")
     if check.upper() == 'Y':
-        mostrar_productos()
+        get_disponibles()
         return True
     else:
         return False
@@ -84,29 +87,34 @@ def finalizar_servicio():
 # --- MAIN ---
 #-------------
 
-print("\n\t-> Bienvenid@!\n") #Posible función de entrada/login
+#Posible funcion leer stock o productos disponibles
+disp = [Producto("stout", 3, 4.5), Producto("ipa", 5, 3.75), Producto("ale", 8, 2.75), Producto("pastry", 4, 5)]
 
-control = True #Control para while, NO EXISTE DO-WHILE EN PYTHON?!
-mostrar_productos()
+#Función de entrada/login
+name = input("\n\t-> Bienvenid@! Cual es su nombre: ")
+print(f"\t{name}, estos son nuestros productos de hoy:\n")
+c = Cliente(name)
 
-#Bucle de pedido
+get_disponibles()
+
+
+#LOOP_PEDIDO
+control = True #Control para while
 while control:
-    pedido = input("\t-> Que desea?\n")
-    #Control existencia de pedido
+    name_product = input("\n\t-> Que desea?\n")
+    #Controla existencia de pedido
     try:
-        if not pedido in set(precio.keys()): 
+        if not existe(name_product): #Realmente seria existe_producto, aunque el cliente solo veria lo que existe
             raise ValueError("ERROR. Introduzca un producto valido.\n")
         else:
             #Si existe, se realiza el servicio
-            comprar(pedido) 
+            comprar(c, name_product) 
             #Pregunta para finalizar servicio, controla salir del bucle infinito
-            control = finalizar_servicio()
+            control = finalizar()
     except ValueError as e:
         print(e)
 
-    
-
 #Si acaba servicio, muestra la cuenta
-mostrar_cesta(cesta)
+pagar(c)
 
-print("\n\t-> Gracias!")#Posible funcion de pago
+print("\n\t-> Gracias!")#Posible funcion de pago'''
