@@ -1,3 +1,20 @@
+def existe(name, lista):
+    check = False
+    #Recorre datos
+    for i in lista:
+        #si hay coincidencia existe
+        if name == i.get_nombre():
+            check = True
+            break
+    return check
+
+def buscar_id(name, lista): #Hace existe antes!!
+    if existe(name, lista):
+        i = 0
+        while (name != lista[i].get_nombre()):
+                i += 1
+        return i
+
 #CLASE OPINIONES, el producto albergara una lista de opiniones
 class Opiniones:
     #__INIT__

@@ -1,6 +1,7 @@
 from producto import *
 #Variable para funcionar con cliente, Leer BBDD
-disp = [Producto("stout", 4.5, 3), Producto("ipa", 3.75, 5), Producto("ale", 2.75, 8), Producto("pastry", 5, 4)]
+if __name__ == "__main__":
+    disp = [Producto("stout", 4.5, 3), Producto("ipa", 3.75, 5), Producto("ale", 2.75, 8), Producto("pastry", 5, 4)]
 
 #CLASE DIRECCION, el cliente prodrá guardar mas de una direccion
 class Direccion:
@@ -19,6 +20,7 @@ class Direccion:
 
 #CLASE CLIENTE
 class Cliente:
+    numero = 0
     #__INIT__
     def __init__(self, nombre, mail = "", tlfn = 123456789):
         self.__nombre = nombre
@@ -26,6 +28,8 @@ class Cliente:
         self.__tlfn = tlfn
         self.__direccion = []
         self.__cesta = [] #Dict or tuple?
+        Cliente.numero += 1
+        print(f"-> Cliente Nuevo. Nº: {Cliente.numero}")
 
     #Getters
     def get_cliente(self):
@@ -51,14 +55,28 @@ class Cliente:
         return self.__cesta.copy()
             
     #Setters
-    def add_producto(self, name, amount):
-        i = 0
-        while (name != disp[i].get_nombre()): #Podria cambiar a punteros o por index()
-            i += 1
-        p = Producto(disp[i].get_nombre(), disp[i].get_precio(), amount) #Arreglar lo del precio debido a que seria privado para el cliente pero solo podria verlo
-        self.__cesta.append(p)
+    if __name__ == "__main__":
+        def add_producto(self, name, amount):
+            i = 0
+            while (name != disp[i].get_nombre()): #Podria cambiar a punteros o por index()
+                i += 1
+            p = Producto(disp[i].get_nombre(), disp[i].get_precio(), amount) #Arreglar lo del precio debido a que seria privado para el cliente pero solo podria verlo
+            self.__cesta.append(p)
+            print(f"\t-> Añadido {amount} {disp[i].get_nombre()}")
+            disp[i].set_stock(disp[i].get_stock() - amount)
 
-        disp[i].set_stock(disp[i].get_stock() - amount)
+            if disp[i].get_stock() == 0:
+                            print(f"\t-> Se acabo el stock de {disp[i].get_nombre()}")
+    else:
+        def add_producto(self, p):
+            #__shop.py__
+            if existe(p.get_nombre(), self.__cesta):
+                i = buscar_id(p.get_nombre(), self.__cesta)
+                self.__cesta[i].set_stock(self.__cesta[i].get_stock() + p.get_stock())
+            else:
+                self.__cesta.append(p)
+
+            print(f"\t-> Añadido {p.get_stock()} {p.get_nombre()}")
 
     def add_direccion(self):
         print("\tIntroduciendo los datos de la direccion del cliente:")
